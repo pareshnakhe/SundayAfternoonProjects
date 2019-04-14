@@ -36,9 +36,9 @@ class KdeEstimator:
 
     def get_posterior(self, param_x):
         """
-		Computes posterior distribution on param_y
-		:return  numpy array, where ith row corresponds to [param_y_val, probability]
-		"""
+        Computes posterior distribution on param_y
+        :return  numpy array, where ith row corresponds to [param_y_val, probability]
+        """
         norm_factor = self._get_norm_factor(param_x)
 
         grid_pts = np.arange(0, self.max_param_y)

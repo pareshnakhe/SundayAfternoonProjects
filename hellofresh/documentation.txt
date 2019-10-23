@@ -1,0 +1,76 @@
+Part 1: Problem Modelling
+
+Stated Goal: Build a model that predicts the average recipe score.
+
+Although, it is not explicitly stated, I believe the intention behind predicting the score for a recipe is infact to predict
+how well a certain recipe would be received. With this assumed context, I shall reframe the problem as follows: Map the score
+of each recipe to one of the four categories, say, 1, 2, 3, 4, where 1 is least favourite and 4 is the most favourite.
+Specifically, recipes with score between 0 and 2 get label 1, those with score between 2 and 3 get label 2 and so on. 
+Now, instead of predicting the average recipe score, we shall predict the label a partcular recipe should be assigned.
+
+
+Initial Data Exploration:
+
+1. Bin Structure:
+
+Let's say, we make six bins for score ratings with ratings between [0, 1) going in bin 1, [1, 2) going in bin 2 and so on. Let's see how the
+ratings are distributed among the six bins:
+
+-> ratings_distribution_overall
+
+Makes sense, there are few recipes with extremely good and bad ratings. This could however hinder learning because of class imbalance. Moreover,
+from a business perspective, a recipe with 1.5/6 rating is not better by a lot than a recipe with 0.5/6 rating. With this in mind, we shall
+merge the two extremes to form just 4 bins.
+
+-> ratings_distribution_grouped
+
+3. What are the number of ingredients in a typical recipe?
+
+In order to get a feel for the what kind of features I can extract from the data, let's see how the histogram of number of ingredients look.
+
+2. Correlation of recipe score and number of Ingredients
+
+I had the suspicion that recipes with a lot of ingredients might have the tendency to get lower ratings on account of the complexity to cook.
+This indeed seems to be the case. To account for this, we shall also use the number of ingredients as a feature.
+
+
+Model Design:
+
+1. Setting up Features:
+
+Clearly, the ingredients themselves are key to the score a recipe gets, but the format in which
+they are available can be peculiar. For example, the ingredient "Onion" can be present as
+"Onion, Yellow", "Onion, Red", "Onion, White Pearl" or even just "Onion Powder". Since, the number of
+recipes is not that large, to reduce the feature space, I convert all the above to just "Onion" as one ingredient.
+We then use the one-hot encoded ingredients list of a recipe together with the total number of ingredients as the feature vector.
+
+2. Classification Algorithm:
+
+The underlying idea used for prediction is the gradient boosting method, specifically, the Xgboost framework based on trees.
+There are two main reasons behind this choice:
+
+1. Capturing complex relationships: Intuitively, we expect complex relationships between the combination of ingredients that usually results in a high score.
+For example, a recipe with A+B+C and A+B+D might have a good rating but A+B+C+D might not. Such relationships can be captured
+and learned efficiently using a tree model.
+
+2. Handling missing values: From a business context, it is very likely that over time new recipes are created with ingredients that haven't been tried
+before. This implies that our model should be flexible enough to make predictions even with one or more unknown ingredients.
+Here again, trees and Xgboost in general does a great job of handing missing values.
+
+3. Feature Importance: Gradient boosting style algorithms allow us to answer questions like: "What are the top 5 ingredients whose 
+inclusion have a major impact on the recipe scores?". For the dataset provided for this task, for example, I can say they are
+Vinegar, Potato, Stock Concentrate, Shrimp, Pasta.
+
+# use code snippet of xgb_model()
+
+3. Performance Metric:
+
+The performance metric we use is the average magnitude of misclassification. Consider for example, that a recipe with label 2 is missclassified as 
+having label 3, then the magnitude of missclassification is 1. If predicted label were 4, then the missclassification error would be 2. We use this
+metric since in the context of recipe ratings, not all missclassifications are equal.
+
+In the model_revaluation.py script, we use 10-fold cross validation to determine the average performance of our model. For the data provided, my proposed
+model achieves an average score of 0.48.
+
+
+

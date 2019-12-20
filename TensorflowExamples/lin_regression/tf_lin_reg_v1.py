@@ -1,4 +1,4 @@
-"""Tensorflow: Linear Regression Example - Version 2
+"""Tensorflow: Linear Regression Example - Version 1
 
 In this script I have implemented the most basic version
 of linear regression example.

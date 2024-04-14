@@ -3,3 +3,7 @@ __pycache__
 .DS_Store
 .vscode/
 Dirichlet_process/notes
+**/.ipynb_checkpoints/
+.python-version
+**/wandb
+
